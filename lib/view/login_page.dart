@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
 import '../environment_config.dart';
 import 'signup_page.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => LoginController(),
-      child: const _LoginPageView(),
-    );
+    return const _LoginPageView();
   }
 }
 
@@ -34,8 +32,9 @@ class _LoginPageView extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Consumer<LoginController>(
-                  builder: (context, controller, child) {
+                child: GetBuilder<LoginController>(
+                  init: LoginController(),
+                  builder: (controller) {
                     return Form(
                       key: controller.formKey,
                       child: Column(
@@ -222,13 +221,17 @@ class _LoginPageView extends StatelessWidget {
   Future<void> _handleLogin(BuildContext context, LoginController controller) async {
     final success = await controller.handleLogin();
     
-    if (success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login successful!'),
-          backgroundColor: Colors.green,
-        ),
+    if (success) {
+      Get.snackbar(
+        'Success',
+        'Login successful!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
+      
+      // Navigate to home page after successful login
+      Get.offNamed('/home');
     }
   }
 
@@ -236,18 +239,17 @@ class _LoginPageView extends StatelessWidget {
     controller.handleForgotPassword();
     
     if (controller.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(controller.errorMessage!),
-          backgroundColor: Colors.orange,
-        ),
+      Get.snackbar(
+        'Info',
+        controller.errorMessage!,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
     }
   }
 
   void _navigateToSignUp(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const SignUpPage()),
-    );
+    Get.to(() => const SignUpPage());
   }
 }

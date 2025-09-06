@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../model/login_model.dart';
 import '../services/auth_service.dart';
 
-class LoginController extends ChangeNotifier {
+class LoginController extends GetxController {
   final AuthService _authService = AuthService();
   
   // Form controllers
@@ -25,7 +26,7 @@ class LoginController extends ChangeNotifier {
   // Toggle password visibility
   void togglePasswordVisibility() {
     _isPasswordVisible = !_isPasswordVisible;
-    notifyListeners();
+    update();
   }
   
   // Validate email
@@ -33,7 +34,7 @@ class LoginController extends ChangeNotifier {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
       return 'Please enter a valid email';
     }
     return null;
@@ -85,19 +86,19 @@ class LoginController extends ChangeNotifier {
   // Set loading state
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    update();
   }
   
   // Set error message
   void _setError(String error) {
     _errorMessage = error;
-    notifyListeners();
+    update();
   }
   
   // Clear error message
   void _clearError() {
     _errorMessage = null;
-    notifyListeners();
+    update();
   }
   
   // Clear form
@@ -105,7 +106,7 @@ class LoginController extends ChangeNotifier {
     emailController.clear();
     passwordController.clear();
     _clearError();
-    notifyListeners();
+    update();
   }
   
   // Handle forgot password

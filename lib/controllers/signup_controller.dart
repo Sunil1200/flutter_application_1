@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../model/signup_model.dart';
 import '../services/auth_service.dart';
 
-class SignUpController extends ChangeNotifier {
+class SignUpController extends GetxController {
   final AuthService _authService = AuthService();
   
   // Form controllers
@@ -29,13 +30,13 @@ class SignUpController extends ChangeNotifier {
   // Toggle password visibility
   void togglePasswordVisibility() {
     _isPasswordVisible = !_isPasswordVisible;
-    notifyListeners();
+    update();
   }
   
   // Toggle confirm password visibility
   void toggleConfirmPasswordVisibility() {
     _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-    notifyListeners();
+    update();
   }
   
   // Validate name
@@ -122,19 +123,19 @@ class SignUpController extends ChangeNotifier {
   // Set loading state
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    update();
   }
   
   // Set error message
   void _setError(String error) {
     _errorMessage = error;
-    notifyListeners();
+    update();
   }
   
   // Clear error message
   void _clearError() {
     _errorMessage = null;
-    notifyListeners();
+    update();
   }
   
   // Clear form
@@ -144,7 +145,7 @@ class SignUpController extends ChangeNotifier {
     passwordController.clear();
     confirmPasswordController.clear();
     _clearError();
-    notifyListeners();
+    update();
   }
   
   @override

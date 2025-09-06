@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import '../controllers/signup_controller.dart';
 import '../environment_config.dart';
-import 'login_page.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => SignUpController(),
-      child: const _SignUpPageView(),
-    );
+    return const _SignUpPageView();
   }
 }
 
@@ -34,8 +30,9 @@ class _SignUpPageView extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Consumer<SignUpController>(
-                  builder: (context, controller, child) {
+                child: GetBuilder<SignUpController>(
+                  init: SignUpController(),
+                  builder: (controller) {
                     return Form(
                       key: controller.formKey,
                       child: Column(
@@ -224,7 +221,7 @@ class _SignUpPageView extends StatelessWidget {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => _navigateToLogin(context),
+                                onPressed: () => _navigateToLogin(),
                                 child: Text(
                                   'Sign In',
                                   style: TextStyle(
@@ -283,21 +280,20 @@ class _SignUpPageView extends StatelessWidget {
   Future<void> _handleSignUp(BuildContext context, SignUpController controller) async {
     final success = await controller.handleSignUp();
     
-    if (success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully!'),
-          backgroundColor: Colors.green,
-        ),
+    if (success) {
+      Get.snackbar(
+        'Success',
+        'Account created successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
       // Navigate to login page after successful signup
-      _navigateToLogin(context);
+      _navigateToLogin();
     }
   }
 
-  void _navigateToLogin(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
+  void _navigateToLogin() {
+    Get.offNamed('/login');
   }
 }
