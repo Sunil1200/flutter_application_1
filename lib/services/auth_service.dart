@@ -1,4 +1,5 @@
 import '../model/login_model.dart';
+import '../model/signup_model.dart';
 
 class AuthResult {
   final bool success;
@@ -39,6 +40,42 @@ class AuthService {
           message: 'Invalid email or password',
         );
       }
+    } catch (e) {
+      return AuthResult(
+        success: false,
+        message: 'Network error: ${e.toString()}',
+      );
+    }
+  }
+  
+  /// Register new user
+  Future<AuthResult> signUp(SignUpModel signUpModel) async {
+    try {
+      // Simulate API call delay
+      await Future.delayed(_apiDelay);
+      
+      // Mock validation logic
+      if (signUpModel.password != signUpModel.confirmPassword) {
+        return AuthResult(
+          success: false,
+          message: 'Passwords do not match',
+        );
+      }
+      
+      // Mock email already exists check
+      if (signUpModel.email == _mockEmail) {
+        return AuthResult(
+          success: false,
+          message: 'Email already exists',
+        );
+      }
+      
+      // Mock successful registration
+      return AuthResult(
+        success: true,
+        message: 'Account created successfully!',
+        token: 'mock_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
+      );
     } catch (e) {
       return AuthResult(
         success: false,

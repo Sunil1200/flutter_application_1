@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../controllers/login_controller.dart';
+import '../controllers/signup_controller.dart';
 import '../environment_config.dart';
-import 'signup_page.dart';
+import 'login_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => LoginController(),
-      child: const _LoginPageView(),
+      create: (context) => SignUpController(),
+      child: const _SignUpPageView(),
     );
   }
 }
 
-class _LoginPageView extends StatelessWidget {
-  const _LoginPageView();
+class _SignUpPageView extends StatelessWidget {
+  const _SignUpPageView();
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class _LoginPageView extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Consumer<LoginController>(
+                child: Consumer<SignUpController>(
                   builder: (context, controller, child) {
                     return Form(
                       key: controller.formKey,
@@ -43,13 +43,13 @@ class _LoginPageView extends StatelessWidget {
                         children: [
                           // Logo/Title
                           Icon(
-                            Icons.lock_outline,
+                            Icons.person_add_outlined,
                             size: 64,
                             color: Theme.of(context).primaryColor,
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Welcome Back',
+                            'Create Account',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.grey[800],
@@ -57,7 +57,7 @@ class _LoginPageView extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Sign in to your account',
+                            'Sign up to get started',
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Colors.grey[600],
                             ),
@@ -91,6 +91,24 @@ class _LoginPageView extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                           ],
+
+                          // Name Field
+                          TextFormField(
+                            controller: controller.nameController,
+                            keyboardType: TextInputType.name,
+                            textCapitalization: TextCapitalization.words,
+                            decoration: InputDecoration(
+                              labelText: 'Full Name',
+                              prefixIcon: const Icon(Icons.person_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(EnvironmentConfig.defaultBorderRadius),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                            ),
+                            validator: controller.validateName,
+                          ),
+                          const SizedBox(height: 16),
 
                           // Email Field
                           TextFormField(
@@ -132,14 +150,39 @@ class _LoginPageView extends StatelessWidget {
                             ),
                             validator: controller.validatePassword,
                           ),
+                          const SizedBox(height: 16),
+
+                          // Confirm Password Field
+                          TextFormField(
+                            controller: controller.confirmPasswordController,
+                            obscureText: !controller.isConfirmPasswordVisible,
+                            decoration: InputDecoration(
+                              labelText: 'Confirm Password',
+                              prefixIcon: const Icon(Icons.lock_outlined),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  controller.isConfirmPasswordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: controller.toggleConfirmPasswordVisibility,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(EnvironmentConfig.defaultBorderRadius),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                            ),
+                            validator: controller.validateConfirmPassword,
+                          ),
                           const SizedBox(height: 24),
 
-                          // Login Button
+                          // Sign Up Button
                           SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: controller.isLoading ? null : () => _handleLogin(context, controller),
+                              onPressed: controller.isLoading ? null : () => _handleSignUp(context, controller),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 foregroundColor: Colors.white,
@@ -160,7 +203,7 @@ class _LoginPageView extends StatelessWidget {
                                       ),
                                     )
                                   : const Text(
-                                      'Sign In',
+                                      'Sign Up',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
@@ -170,33 +213,20 @@ class _LoginPageView extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
 
-                          // Forgot Password
-                          TextButton(
-                            onPressed: () => _handleForgotPassword(context, controller),
-                            child: Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-
-                          // Sign Up Link
-                          const SizedBox(height: 16),
+                          // Login Link
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Don't have an account? ",
+                                'Already have an account? ',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => _navigateToSignUp(context),
+                                onPressed: () => _navigateToLogin(context),
                                 child: Text(
-                                  'Sign Up',
+                                  'Sign In',
                                   style: TextStyle(
                                     color: Theme.of(context).primaryColor,
                                     fontWeight: FontWeight.w500,
@@ -206,6 +236,37 @@ class _LoginPageView extends StatelessWidget {
                             ],
                           ),
 
+                          // Password requirements info
+                          const SizedBox(height: 24),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue[200]!),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Password Requirements:',
+                                  style: TextStyle(
+                                    color: Colors.blue[800],
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '• At least 6 characters\n• One uppercase letter\n• One lowercase letter\n• One number',
+                                  style: TextStyle(
+                                    color: Colors.blue[700],
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -219,35 +280,24 @@ class _LoginPageView extends StatelessWidget {
     );
   }
 
-  Future<void> _handleLogin(BuildContext context, LoginController controller) async {
-    final success = await controller.handleLogin();
+  Future<void> _handleSignUp(BuildContext context, SignUpController controller) async {
+    final success = await controller.handleSignUp();
     
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Login successful!'),
+          content: Text('Account created successfully!'),
           backgroundColor: Colors.green,
         ),
       );
+      // Navigate to login page after successful signup
+      _navigateToLogin(context);
     }
   }
 
-  void _handleForgotPassword(BuildContext context, LoginController controller) {
-    controller.handleForgotPassword();
-    
-    if (controller.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(controller.errorMessage!),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    }
-  }
-
-  void _navigateToSignUp(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const SignUpPage()),
+  void _navigateToLogin(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 }
